@@ -31,4 +31,13 @@
     </div>
     <script src="app.js"></script>
 </body>
+    <form id="createForm">
+    <textarea name="text" placeholder="Enter your quote..." required></textarea>
+    <input name="media" type="url" placeholder="Media URL (image/video)" pattern="https://.*">
+    <select name="mediaType" id="mediaType">
+        <option value="image">Image</option>
+        <option value="video">Video</option>
+    </select>
+    <button type="submit">Post Quote</button>
+    </form>
 </html>

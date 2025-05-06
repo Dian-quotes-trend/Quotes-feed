@@ -79,3 +79,32 @@ const createPostHTML = (post) => `
         }
     });
 });
+function handleCreateForm() {
+    const form = document.getElementById('createForm');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            
+            const newPost = {
+                id: Date.now(),
+                text: formData.get('text'),
+                media: formData.get('media') || null, // Handle empty media
+                mediaType: formData.get('mediaType'),
+                likes: 0,
+                comments: [],
+                date: new Date().toISOString()
+            };
+
+            // Only add media if URL exists
+            if (!newPost.media) {
+                delete newPost.media;
+                delete newPost.mediaType;
+            }
+
+            posts.push(newPost);
+            localStorage.setItem('posts', JSON.stringify(posts));
+            window.location.href = 'index.html';
+        });
+    }
+}

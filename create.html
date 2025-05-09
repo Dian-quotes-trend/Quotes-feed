@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuoteFeed | Create</title>
+    <title>Create Post | QuoteFeed</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,25 +19,20 @@
 
     <div class="create-container">
         <h1>Create New Post</h1>
+        <div class="warning">
+            Note: Posts are saved in your browser only (won't appear on other devices)
+        </div>
         <form id="createForm">
-            <textarea placeholder="Enter your quote..." required></textarea>
-            <input type="url" placeholder="Media URL (image/video)" pattern="https://.*">
-            <select id="mediaType">
+            <textarea name="text" placeholder="Enter your quote..." required></textarea>
+            <input name="media" type="url" placeholder="Media URL (image/video)">
+            <select name="mediaType">
                 <option value="image">Image</option>
                 <option value="video">Video</option>
             </select>
             <button type="submit">Post Quote</button>
         </form>
     </div>
+
     <script src="app.js"></script>
 </body>
-    <form id="createForm">
-    <textarea name="text" placeholder="Enter your quote..." required></textarea>
-    <input name="media" type="url" placeholder="Media URL (image/video)" pattern="https://.*">
-    <select name="mediaType" id="mediaType">
-        <option value="image">Image</option>
-        <option value="video">Video</option>
-    </select>
-    <button type="submit">Post Quote</button>
-    </form>
 </html>

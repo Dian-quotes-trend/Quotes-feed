@@ -12,6 +12,32 @@ body {
     min-height: 100vh;
 }
 
+/* Warning Message */
+.warning {
+    color: #ff4444;
+    padding: 1rem;
+    border: 2px solid #ff4444;
+    border-radius: 8px;
+    margin: 1rem 0;
+    background: rgba(255, 68, 68, 0.1);
+}
+
+/* Rest of your existing CSS remains the same */
+/* [Include all previous CSS styles from earlier answer here] */
+/* Base Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: linear-gradient(135deg, #0a0a2e, #000033);
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+}
+
 /* Navigation */
 nav {
     background: rgba(0, 0, 102, 0.9);

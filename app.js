@@ -93,7 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.closest('.post').remove();
         }
     });
-
+// Sync tabs
+window.addEventListener('storage', (e) => {
+    if (e.key === 'posts') {
+        loadPosts();
+    }
+});
     // Comment System
     document.body.addEventListener('keypress', (e) => {
         if (e.target.classList.contains('comment-input') && e.key === 'Enter') {

@@ -1,5 +1,19 @@
-// LocalStorage Management
-let posts = JSON.parse(localStorage.getItem('posts')) || [];
+// LocalStorage Manager
+const postManager = {
+    getPosts: () => JSON.parse(localStorage.getItem('posts')) || [],
+    savePosts: (posts) => localStorage.setItem('posts', JSON.stringify(posts)),
+    
+    createPost: (post) => {
+        const posts = postManager.getPosts();
+        posts.push(post);
+        postManager.savePosts(posts);
+    },
+    
+    deletePost: (postId) => {
+        const posts = postManager.getPosts().filter(p => p.id !== postId);
+        postManager.savePosts(posts);
+    }
+};
 
 // Post Template
 const createPostHTML = (post) => `
@@ -11,8 +25,12 @@ const createPostHTML = (post) => `
     <p class="quote">"${post.text}"</p>
     ${post.media ? `
         ${post.mediaType === 'image' ? 
-            `<img src="${post.media}" class="post-media">` : 
-            `<div class="video-container"><video class="post-media" controls><source src="${post.media}"></video></div>`
+            `<img src="${post.media}" class="post-media" alt="Post media">` : 
+            `<div class="video-container">
+                <video class="post-media" controls>
+                    <source src="${post.media}" type="video/mp4">
+                </video>
+            </div>`
         }
     ` : ''}
     <div class="post-actions">
@@ -22,40 +40,60 @@ const createPostHTML = (post) => `
     <div class="comments">
         ${post.comments.map(comment => `<div class="comment">${comment}</div>`).join('')}
     </div>
-</div>
-`;
+</div>`;
 
-// Load Posts
-function loadPosts() {
-    const feed = document.querySelector('.feed-container');
-    if (feed) {
-        posts = JSON.parse(localStorage.getItem('posts')) || [];
-        feed.innerHTML = posts.map(post => createPostHTML(post)).reverse().join('');
+// Initialize App
+document.addEventListener('DOMContentLoaded', () => {
+    // Load Posts
+    const feedContainer = document.querySelector('.feed-container');
+    if (feedContainer) {
+        const posts = postManager.getPosts();
+        feedContainer.innerHTML = posts.reverse().map(createPostHTML).join('');
     }
-}
 
-// Create Post
-const createPostHTML = (post) => `
-<div class="post" data-id="${post.id}">
-    <div class="post-header">
-        <span class="author">${post.author || '@user'}</span>
-        <button class="delete-btn">×</button>
-    </div>
-    <p class="quote">"${post.text}"</p>
-    ${post.media ? `
-        ${post.mediaType === 'image' ? 
-            `<img src="${post.media}" class="post-media" alt="Quote image">` : 
-            `<div class="video-container"><video class="post-media" controls><source src="${post.media}" type="video/mp4"></video></div>`
+    // Handle Post Creation
+    const createForm = document.getElementById('createForm');
+    if (createForm) {
+        createForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(createForm);
+            
+            const newPost = {
+                id: Date.now(),
+                text: formData.get('text'),
+                media: formData.get('media') || null,
+                mediaType: formData.get('mediaType'),
+                likes: 0,
+                comments: [],
+                date: new Date().toISOString()
+            };
+
+            postManager.createPost(newPost);
+            window.location.href = 'index.html';
+        });
+    }
+
+    // Event Delegation
+    document.body.addEventListener('click', (e) => {
+        // Like Button
+        if (e.target.closest('.like-btn')) {
+            const postElement = e.target.closest('.post');
+            const postId = Number(postElement.dataset.id);
+            const posts = postManager.getPosts();
+            const post = posts.find(p => p.id === postId);
+            post.likes++;
+            postManager.savePosts(posts);
+            postElement.querySelector('.like-count').textContent = post.likes;
         }
-    ` : ''}
-    <div class="post-actions">
-        <button class="like-btn">♥ <span class="like-count">${post.likes}</span></button>
-        <input type="text" class="comment-input" placeholder="Add a comment...">
-    </div>
-    <div class="comments">
-        ${post.comments.map(comment => `<div class="comment">${comment}</div>`).join('')}
-    </div>
-</div>
+
+        // Delete Post
+        if (e.target.classList.contains('delete-btn')) {
+            const postId = Number(e.target.closest('.post').dataset.id);
+            postManager.deletePost(postId);
+            e.target.closest('.post').remove();
+        }
+    });
+
     // Comment System
     document.body.addEventListener('keypress', (e) => {
         if (e.target.classList.contains('comment-input') && e.key === 'Enter') {
@@ -65,10 +103,11 @@ const createPostHTML = (post) => `
             
             if (comment) {
                 const postElement = input.closest('.post');
-                const postId = postElement.dataset.id;
-                const post = posts.find(p => p.id == postId);
+                const postId = Number(postElement.dataset.id);
+                const posts = postManager.getPosts();
+                const post = posts.find(p => p.id === postId);
                 post.comments.push(comment);
-                localStorage.setItem('posts', JSON.stringify(posts));
+                postManager.savePosts(posts);
 
                 const commentDiv = document.createElement('div');
                 commentDiv.className = 'comment';
@@ -79,32 +118,3 @@ const createPostHTML = (post) => `
         }
     });
 });
-function handleCreateForm() {
-    const form = document.getElementById('createForm');
-    if (form) {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = new FormData(form);
-            
-            const newPost = {
-                id: Date.now(),
-                text: formData.get('text'),
-                media: formData.get('media') || null, // Handle empty media
-                mediaType: formData.get('mediaType'),
-                likes: 0,
-                comments: [],
-                date: new Date().toISOString()
-            };
-
-            // Only add media if URL exists
-            if (!newPost.media) {
-                delete newPost.media;
-                delete newPost.mediaType;
-            }
-
-            posts.push(newPost);
-            localStorage.setItem('posts', JSON.stringify(posts));
-            window.location.href = 'index.html';
-        });
-    }
-}
